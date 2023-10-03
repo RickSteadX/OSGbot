@@ -9,12 +9,12 @@ using System.Reflection;
 namespace App {
     class Program
     {
-        private DiscordSocketClient _client;
-        private CommandService _commands;
-        private IServiceProvider _services;
-        private CommandServiceConfig _commandConfig;
-        private ICommandContext _context;
-        private InteractionService _interactionService;
+        private DiscordSocketClient? _client;
+        private CommandService? _commands;
+        private IServiceProvider? _services;
+        private CommandServiceConfig? _commandConfig;
+        private ICommandContext? _context;
+        private InteractionService? _interactionService;
         private ulong _guildId = 868119144288096277;
 
         public static async Task Main(string[] args)
@@ -40,7 +40,6 @@ namespace App {
                 CaseSensitiveCommands = false,
                 DefaultRunMode = Discord.Commands.RunMode.Async
             };
-            //_services = new InteractionService(_client.Rest); // You can inject services here if needed.
 
             _client.Log += LogAsync;
             _client.Ready += OnReadyAsync;
