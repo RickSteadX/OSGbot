@@ -5,8 +5,9 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Discord.Interactions;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace App {
+namespace OSGbot {
     class Program
     {
         private DiscordSocketClient? _client;
@@ -31,6 +32,14 @@ namespace App {
             await program.RunBotAsync(secret);
         }
 
+        static IServiceProvider CreateServices()
+        {
+            var collection = new ServiceCollection()
+                .AddSingleton(new SQLiteService("Data Source=mydatabase.db"));
+
+            return collection.BuildServiceProvider();
+        }
+
         public async Task RunBotAsync(string Token)
         {
             _client = new DiscordSocketClient();
@@ -40,6 +49,8 @@ namespace App {
                 CaseSensitiveCommands = false,
                 DefaultRunMode = Discord.Commands.RunMode.Async
             };
+            
+            _services = CreateServices();
 
             _client.Log += LogAsync;
             _client.Ready += OnReadyAsync;
@@ -61,12 +72,12 @@ namespace App {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             await _interactionService.RegisterCommandsToGuildAsync(_guildId);
 
+
             _client.InteractionCreated += async (x) =>
             {
                 var ctx = new SocketInteractionContext(_client, x);
                 await _interactionService.ExecuteCommandAsync(ctx, _services);
             };
-            Console.WriteLine($"{_client.CurrentUser.Username} is connected!");
         }
     }
 }
