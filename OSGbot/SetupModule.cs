@@ -28,16 +28,10 @@ namespace OSGbot
             EmbedBuilder EB = new()
             {
                 Title = "Принято!",
-                Description = "Канал для уведомлений установлен.",
+                Description =  $"Канал для уведомлений установлен на <#{Context.Channel.Id}>",
                 Footer = new() { Text = "O.S.G. Dyachenko", IconUrl = Context.Guild.IconUrl }
             };
             await RespondAsync(embed: EB.Build());
-        }
-
-        [SlashCommand("test", "test")]
-        public async Task Test()
-        {
-            await RespondAsync($"<#{_SQLiteService.ExecuteGlobalValueQuery(_SQLiteService.channelIDValueName)}>");
         }
     }
 }

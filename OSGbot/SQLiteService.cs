@@ -12,8 +12,8 @@ namespace OSGbot
 
     {
         private readonly string _connectionString;
-        private readonly string globalValueDBname = "GlobalValues";
-        private readonly string DBname = "Users";
+        public readonly string globalValueDBname = "GlobalValues";
+        public readonly string DBname = "Users";
         public readonly string channelIDValueName = "channelID";
 
         public SQLiteService(string connectionString)
@@ -22,7 +22,7 @@ namespace OSGbot
 
             ExecuteNonQuery($"CREATE TABLE IF NOT EXISTS {DBname} (" +
                         "Id INTEGER PRIMARY KEY, " +
-                        "discordID INTEGER, " +
+                        "discordID INTEGER UNIQUE, " +
                         "notificationDate INTEGER)");
 
             ExecuteNonQuery($"CREATE TABLE IF NOT EXISTS {globalValueDBname} (" +
@@ -83,6 +83,7 @@ namespace OSGbot
                     using (SqliteDataReader reader = command.ExecuteReader())
                     {
                         reader.Read();
+                        if (!reader.HasRows) return string.Empty;
                         return reader.GetString(0);
                     }
                 }

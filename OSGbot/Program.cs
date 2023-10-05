@@ -79,6 +79,13 @@ namespace OSGbot {
             await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             await _interactionService.RegisterCommandsToGuildAsync(_guildId);
 
+            var thread = new Thread(async () =>
+            {
+                var timer = new ReminderSendModule(_services, _client);
+                await Task.Run(timer.StartTimer);
+            });
+            
+            thread.Start();
 
             _client.InteractionCreated += async (x) =>
             {
