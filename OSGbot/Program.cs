@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.Interactions;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Data.Sqlite;
 
 namespace OSGbot {
     class Program
@@ -34,8 +35,14 @@ namespace OSGbot {
 
         static IServiceProvider CreateServices()
         {
+            String dbFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SQLiteDB.db");
+            var connectionString = new SqliteConnectionStringBuilder(null)
+            {
+                DataSource = dbFile,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+            }.ToString();
             var collection = new ServiceCollection()
-                .AddSingleton(new SQLiteService("Data Source=mydatabase.db"));
+                .AddSingleton(new SQLiteService(connectionString));
 
             return collection.BuildServiceProvider();
         }

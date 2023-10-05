@@ -22,8 +22,9 @@ namespace OSGbot
         [SlashCommand("канал-уведомления", "Устанавливает канал для уведомлений.")]
         public async Task ReminderChannelSet()
         {
-            _SQLiteService.CreateTable("CREATE TABLE IF NOT EXISTS Users (Id INTEGER PRIMARY KEY, Name TEXT)");
-
+            _SQLiteService.ExecuteInsertOrReplace("GlobalValues", new Dictionary<string, object> { 
+                { "Name", _SQLiteService.channelIDValueName }, 
+                { "Value", Context.Channel.Id } });
             EmbedBuilder EB = new()
             {
                 Title = "Принято!",
@@ -31,6 +32,12 @@ namespace OSGbot
                 Footer = new() { Text = "O.S.G. Dyachenko", IconUrl = Context.Guild.IconUrl }
             };
             await RespondAsync(embed: EB.Build());
+        }
+
+        [SlashCommand("test", "test")]
+        public async Task Test()
+        {
+            await RespondAsync($"<#{_SQLiteService.ExecuteGlobalValueQuery(_SQLiteService.channelIDValueName)}>");
         }
     }
 }
