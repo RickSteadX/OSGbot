@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -32,17 +33,44 @@ namespace OSGbot
 
             _running = true;
 
-            await Console.Out.WriteLineAsync("Timer started");
+            await Console.Out.WriteLineAsync("Timer started.");
 
             await Task.Run(async () =>
             {
                 while (!_cancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    await Console.Out.WriteLineAsync("Tick");
+                    await Console.Out.WriteLineAsync("Checking for notifications...");
+                    await SendReminder();
 
                     await Task.Delay(_interval);
                 }
             }, _cancellationTokenSource.Token);
+        }
+
+        public async Task SendReminder()
+        {
+            DateTime currentTime = DateTime.UtcNow;
+            long unixTime = ((DateTimeOffset)currentTime).ToUnixTimeSeconds();
+
+            string query = $"SELECT discordID FROM Users WHERE notificationDate < {unixTime}";
+            List<string> discordIDs = _SQLiteService.ExecuteQuery(query);
+            ulong channel = ulong.Parse(_SQLiteService.ExecuteGlobalValueQuery(_SQLiteService.channelIDValueName));
+            
+
+            EmbedBuilder embedBuilder = new()
+            {
+                Title = "Внимание!",
+                Description = "Срок вашей медкарты истекает через 24 часа.\nОбновите её как можно скорее.",
+                Footer = new() { Text = "O.S.G. Dyachenko", IconUrl = _client.GetGuild(868119144288096277).IconUrl }
+            };
+
+            foreach (string discordID in discordIDs)
+            {
+                await _client.GetGuild(868119144288096277).GetTextChannel(channel)
+                    .SendMessageAsync($"<@{discordID}>", embed: embedBuilder.Build());
+                _SQLiteService.ExecuteNonQuery($"DELETE FROM Users WHERE discordID='{discordID}'");
+                await Task.Delay(10000);
+            }
         }
 
         public void StopTimer()

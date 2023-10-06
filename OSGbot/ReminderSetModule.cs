@@ -90,7 +90,7 @@ namespace OSGbot
                 EmbedBuilder builder = new()
                 {
                     Title = "Ошибка!",
-                    Description = $"Канал для уведомлений не установлен,\nИспользуйте </канал-уведомления:1159215165653405778> в нужном канале.",
+                    Description = $"Канал для уведомлений не установлен,\nИспользуйте `/канал-уведомления`> в нужном канале.",
                     Color = Color.Red,
                     Footer = new() { Text = "O.S.G. Dyachenko", IconUrl = Context.Guild.IconUrl }
                 };

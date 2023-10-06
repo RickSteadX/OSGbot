@@ -89,5 +89,27 @@ namespace OSGbot
                 }
             }
         }
+
+        public List<string> ExecuteQuery(string query)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = new SqliteCommand(query, connection))
+                {
+                    using (SqliteDataReader reader = command.ExecuteReader())
+                    {
+                        List<string> resultList = new List<string>();
+
+                        while (reader.Read())
+                        {
+                            resultList.Add(reader.GetString(0).ToString());
+                        }
+
+                        return resultList;
+                    }
+                }
+            }
+        }
     }
 }
